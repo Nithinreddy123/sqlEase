@@ -17,11 +17,13 @@ public interface CollectionsDAO {
 
 	public Map<String, Object> putItemIntoCollection(String id, Map<String, Object> item);
 
-	public List<Map<String, Object>> getItemsFromCollection(String collectionId,Map<String,String> params);
-	
-	public boolean copyCollectionContents(String source,String destination,List<Map<String,Object>> attributes);
-	
-	public boolean alterCollectionName(String source,String destination);
-	
+	public List<Map<String, Object>> getItemsFromCollection(String collectionId, Map<String, String> params);
+
+	public List<Map<String, Object>> updateCollectionItem(String collectionId, int itemId, Map<String, Object> item);
+
+	public boolean copyCollectionContents(String source, String destination, List<Map<String, Object>> attributes);
+
+	public boolean alterCollectionName(String source, String destination);
+
 	public boolean dropCollection(String collectionId);
 }

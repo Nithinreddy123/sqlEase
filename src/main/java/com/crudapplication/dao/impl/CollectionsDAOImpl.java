@@ -88,6 +88,20 @@ public class CollectionsDAOImpl implements CollectionsDAO {
 		return item;
 	}
 
+	@Override
+	public List<Map<String, Object>> updateCollectionItem(String collectionId, int itemId, Map<String, Object> item) {
+		// TODO Auto-generated method stub
+
+		String query = CollectionsSqlStatements.prepareUpdateCollectionItemStatement(collectionId, itemId, item);
+		logger.debug(query);
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		int rows = jdbcTemplate.update(c -> c.prepareStatement(query, Statement.RETURN_GENERATED_KEYS), keyHolder);
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("id", ""+itemId);
+		List<Map<String, Object>> updatedItem = getItemsFromCollection(collectionId, params);
+		return updatedItem;
+	}
+
 	public List<Map<String, Object>> getItemsFromCollection(String collectionId, Map<String, String> params) {
 
 		List<Map<String, Object>> collectionItems = jdbcTemplate.query(
@@ -117,4 +131,5 @@ public class CollectionsDAOImpl implements CollectionsDAO {
 		jdbcTemplate.update(CollectionsSqlStatements.prepareDropCollection(collectionId));
 		return false;
 	}
+
 }

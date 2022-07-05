@@ -235,10 +235,38 @@ public class CollectionsControllerImpl implements CollectionsController {
 		boolean dropStatus = collectionsDao.dropCollection(id);
 		// rename collection from duplicate to new collection name
 		boolean alterStatus = collectionsDao.alterCollectionName(duplicateTableName, newCollectionId);
+		// update
+		boolean updateStatus = permissionsDao.updateCollectionId(id, newCollectionId);
 		collection.setCollection_id(newCollectionId);
 		response.add(createdCollection);
 
 		return (ResponseGenerator.getGenericResponse(response));
+	}
+
+	@Override
+	public ResponseEntity<Map<String, Object>> updateCollectionItem(String collectionId, String itemId,
+			Map<String, Object> item, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+
+		int roleId = (int) request.getAttribute("role_id");
+
+		List<String> collections = collectionsDao.getCollectionsByRoleId(roleId);
+		logger.debug("Found collections: " + collections + " " + "for Role: " + roleId);
+		List<String> permissions = permissionsDao.getPermissionByCollectionId(collectionId);
+
+		if (!((collections.contains(collectionId)) && (permissions.contains("update")))
+				&& !(roleId == UserConstants.ADMIN_ROLE_ID)) {
+
+			throw new UserException("INSUFFICIENT PRIVILIGES", HttpStatus.FORBIDDEN);
+		}
+
+		int id = Integer.parseInt(itemId);
+
+		List<Map<String, Object>> updatedItem = collectionsDao.updateCollectionItem(collectionId, id, item);
+
+		
+
+		return (ResponseGenerator.getGenericResponse(updatedItem));
 	}
 
 	public Map<String, Object> getCollectionAttributes(String collectionId) {

@@ -16,9 +16,18 @@ public class PermissionsStatement {
 
 		return query;
 	}
+
 	public static String prepareGetPermissionStatement(String collectionId) {
-		
-		String query="select * from"+" "+PermissionsConstants.TABLE_NAME+" "+"where subject='"+collectionId+"'" ;
+
+		String query = "select * from" + " " + PermissionsConstants.TABLE_NAME + " " + "where subject='" + collectionId
+				+ "'";
+		return query;
+	}
+
+	public static String prepareUpdateCollectionIdStatement(String oldId, String newId) {
+
+		String query = "update" + " " + PermissionsConstants.TABLE_NAME + " " + "set subject='" + newId + "'" + " "
+				+ "where subject='" + oldId + "'";
 		return query;
 	}
 }

@@ -4,6 +4,7 @@ public class CollectionConstants {
 
 	public static final String ROUTE="/collection";
 	public static final String ITEM_ROUTE="/content/collection/{id}";
+	public static final String ITEM_ROUTE_ID="/content/collection/{collectionId}/{itemId}";
 	public static final String ROUTE_WITH_PATH_VARIABLE="/collection/{id}";
 	public static final String COLLECTION_ID="collectionId";
 	public static final String CREATED_AT="created_at";

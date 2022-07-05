@@ -44,4 +44,11 @@ public class PermissionsDAOImpl implements PermissionsDAO {
 		return permissions;
 	}
 
+	@Override
+	public boolean updateCollectionId(String oldCollectionId, String newCollectionId) {
+
+		jdbcTemplate.update(PermissionsStatement.prepareUpdateCollectionIdStatement(oldCollectionId, newCollectionId));
+		
+		return true;
+	}
 }

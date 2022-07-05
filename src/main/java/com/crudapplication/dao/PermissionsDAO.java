@@ -9,4 +9,5 @@ public interface PermissionsDAO {
 
 	public boolean createPermission(Collection collection);
 	public List<String> getPermissionByCollectionId(String collectionId);
+	public boolean updateCollectionId(String oldCollectionId,String newCollectionId);
 }

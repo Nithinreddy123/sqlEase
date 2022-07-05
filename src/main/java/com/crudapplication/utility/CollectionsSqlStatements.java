@@ -152,12 +152,12 @@ public class CollectionsSqlStatements {
 		columns += "id";
 
 		columns += ")";
-		
-		String columnsWithoutParanthesis=columns.replace('(', ' ');
-		columnsWithoutParanthesis=columnsWithoutParanthesis.replace(')', ' ');
-		
-		String query = "INSERT INTO" + " " + destination + " " + columns + " " + "SELECT" + " " + columnsWithoutParanthesis + " " + "FROM"
-				+ " " + source;
+
+		String columnsWithoutParanthesis = columns.replace('(', ' ');
+		columnsWithoutParanthesis = columnsWithoutParanthesis.replace(')', ' ');
+
+		String query = "INSERT INTO" + " " + destination + " " + columns + " " + "SELECT" + " "
+				+ columnsWithoutParanthesis + " " + "FROM" + " " + source;
 		;
 		return query;
 
@@ -171,6 +171,32 @@ public class CollectionsSqlStatements {
 	public static final String prepareDropCollection(String collectionId) {
 
 		String query = "DROP TABLE" + " " + collectionId;
+		return query;
+
+	}
+
+	public static final String prepareUpdateCollectionItemStatement(String collectionId, int itemId,
+			Map<String, Object> item) {
+
+		String query = "UPDATE" + " " + collectionId + " ";
+
+		String setProps = "SET" + " ";
+
+		for (Map.Entry<String, Object> entry : item.entrySet()) {
+
+			try {
+				int value = Integer.parseInt((String) entry.getValue());
+				setProps += entry.getKey() + "=" + value + ",";
+			} catch (Exception e) {
+				setProps += entry.getKey() + "=" + "'" + entry.getValue() + "'" + ",";
+			}
+
+		}
+
+		String whereClause = "WHERE id=" + itemId;
+		setProps = setProps.substring(0, setProps.length() - 1);
+
+		query += setProps + whereClause;
 		return query;
 
 	}
