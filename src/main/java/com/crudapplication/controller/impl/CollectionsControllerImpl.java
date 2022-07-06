@@ -14,8 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.annotation.Propagation;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import com.crudapplication.constants.CollectionConstants;
@@ -25,11 +24,9 @@ import com.crudapplication.dao.CollectionsDAO;
 import com.crudapplication.dao.PermissionsDAO;
 import com.crudapplication.entity.Collection;
 import com.crudapplication.entity.CollectionResponse;
-import com.crudapplication.entity.User;
+
 import com.crudapplication.exception.UserException;
-import com.crudapplication.utility.CollectionsSqlStatements;
 import com.crudapplication.utility.ResponseGenerator;
-import com.crudapplication.utility.UUIDGenerator;
 
 @Component
 @Transactional
@@ -45,13 +42,7 @@ public class CollectionsControllerImpl implements CollectionsController {
 	@Override
 	public ResponseEntity<Map<String, Object>> createCollection(Collection collection, HttpServletRequest request) {
 
-		int role_id = (int) request.getAttribute("role_id");
-
-		if (role_id != UserConstants.ADMIN_ROLE_ID) {
-
-			throw new UserException("INSUFFICIENT PRIVILIGES", HttpStatus.FORBIDDEN);
-
-		}
+		validatePermissions(request, null, CollectionConstants.ADMIN);
 		logger.debug("Creating collection: " + collection.getCollection_id() + " with Admin Access");
 		Collection createdCollection = collectionsDao.createCollection(collection);
 		boolean status = permissionsDao.createPermission(collection);
@@ -63,6 +54,8 @@ public class CollectionsControllerImpl implements CollectionsController {
 
 	@Override
 	public ResponseEntity<Map<String, Object>> getCollections(HttpServletRequest request) {
+
+//		validatePermissions(request, null, CollectionConstants.ADMIN);
 
 		int roleId = (int) request.getAttribute("role_id");
 		logger.debug("Retrieving collections with Role: " + roleId);
@@ -96,17 +89,8 @@ public class CollectionsControllerImpl implements CollectionsController {
 			HttpServletRequest request) {
 		// TODO Auto-generated method stub
 
-		int roleId = (int) request.getAttribute("role_id");
+		validatePermissions(request, id, CollectionConstants.UPDATE);
 
-		List<String> collections = collectionsDao.getCollectionsByRoleId(roleId);
-		logger.debug("Found collections: " + collections + " " + "for Role: " + roleId);
-		List<String> permissions = permissionsDao.getPermissionByCollectionId(id);
-		logger.debug("Found permissions: " + permissions + " " + "on Collection: " + id);
-		if (!((collections.contains(id)) && (permissions.contains("update")))
-				&& !(roleId == UserConstants.ADMIN_ROLE_ID)) {
-
-			throw new UserException("INSUFFICIENT PRIVILIGES", HttpStatus.FORBIDDEN);
-		}
 		Map<String, Object> createdItem = collectionsDao.putItemIntoCollection(id, item);
 
 		List<Map<String, Object>> itemList = new ArrayList<Map<String, Object>>();
@@ -121,17 +105,7 @@ public class CollectionsControllerImpl implements CollectionsController {
 	public ResponseEntity<Map<String, Object>> getItemsFromCollection(String id, Map<String, String> params,
 			HttpServletRequest request) {
 
-		int roleId = (int) request.getAttribute("role_id");
-
-		List<String> collections = collectionsDao.getCollectionsByRoleId(roleId);
-		logger.debug("Found collections: " + collections + " " + "for Role: " + roleId);
-		List<String> permissions = permissionsDao.getPermissionByCollectionId(id);
-
-		if (!((collections.contains(id)) && (permissions.contains("read")))
-				&& !(roleId == UserConstants.ADMIN_ROLE_ID)) {
-
-			throw new UserException("INSUFFICIENT PRIVILIGES", HttpStatus.FORBIDDEN);
-		}
+		validatePermissions(request, id, CollectionConstants.READ);
 
 		List<Map<String, Object>> items = collectionsDao.getItemsFromCollection(id, params);
 
@@ -142,6 +116,8 @@ public class CollectionsControllerImpl implements CollectionsController {
 	@Transactional(rollbackFor = { Exception.class, UserException.class })
 	public ResponseEntity<Map<String, Object>> updateCollectionMetaData(String id,
 			Map<String, Object> updatedCollection, HttpServletRequest request) {
+
+		validatePermissions(request, id, CollectionConstants.UPDATE);
 
 		String newCollectionId = (String) updatedCollection.get(CollectionConstants.COLLECTION_ID);
 //		attributes: { columnName: {type: dataType}     }
@@ -248,29 +224,53 @@ public class CollectionsControllerImpl implements CollectionsController {
 			Map<String, Object> item, HttpServletRequest request) {
 		// TODO Auto-generated method stub
 
+		validatePermissions(request, collectionId, CollectionConstants.UPDATE);
+
+		int id = Integer.parseInt(itemId);
+
+		List<Map<String, Object>> updatedItem = collectionsDao.updateCollectionItem(collectionId, id, item);
+
+		return (ResponseGenerator.getGenericResponse(updatedItem));
+	}
+
+	@Override
+	public ResponseEntity<Map<String, Object>> deleteCollection(String id, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+
+		validatePermissions(request, null, CollectionConstants.ADMIN);
+		boolean status = collectionsDao.dropCollection(id);
+
+		return null;
+	}
+
+	public Map<String, Object> getCollectionAttributes(String collectionId) {
+
+		return collectionsDao.getCollectionAttributes(collectionId);
+	}
+
+	private boolean validatePermissions(HttpServletRequest request, String collectionId, String action) {
+
 		int roleId = (int) request.getAttribute("role_id");
 
 		List<String> collections = collectionsDao.getCollectionsByRoleId(roleId);
 		logger.debug("Found collections: " + collections + " " + "for Role: " + roleId);
 		List<String> permissions = permissionsDao.getPermissionByCollectionId(collectionId);
 
-		if (!((collections.contains(collectionId)) && (permissions.contains("update")))
+		if (action == CollectionConstants.ADMIN) {
+
+			if (roleId != UserConstants.ADMIN_ROLE_ID) {
+
+				throw new UserException("INSUFFICIENT PRIVILIGES", HttpStatus.FORBIDDEN);
+
+			}
+
+		} else if (!((collections.contains(collectionId)) && (permissions.contains(action)))
 				&& !(roleId == UserConstants.ADMIN_ROLE_ID)) {
 
 			throw new UserException("INSUFFICIENT PRIVILIGES", HttpStatus.FORBIDDEN);
 		}
 
-		int id = Integer.parseInt(itemId);
+		return true;
 
-		List<Map<String, Object>> updatedItem = collectionsDao.updateCollectionItem(collectionId, id, item);
-
-		
-
-		return (ResponseGenerator.getGenericResponse(updatedItem));
-	}
-
-	public Map<String, Object> getCollectionAttributes(String collectionId) {
-
-		return collectionsDao.getCollectionAttributes(collectionId);
 	}
 }

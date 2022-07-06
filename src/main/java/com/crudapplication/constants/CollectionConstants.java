@@ -1,5 +1,8 @@
 package com.crudapplication.constants;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class CollectionConstants {
 
 	public static final String ROUTE="/collection";
@@ -16,4 +19,8 @@ public class CollectionConstants {
 	public static final String ATTRIBUTES="attributes";
 	public static final String EMPTY_STRING="";
 	public static final String DUPLICATE_COLLECTION_NAME="duplicate";
+	public static final String UPDATE = "update";
+	public static final String DELETE = "delete";
+	public static final String READ = "read";
+	public static final String ADMIN = "admin";
 }
