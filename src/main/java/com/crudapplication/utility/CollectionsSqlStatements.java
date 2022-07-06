@@ -200,5 +200,7 @@ public class CollectionsSqlStatements {
 		return query;
 
 	}
+	
+	
 
 }

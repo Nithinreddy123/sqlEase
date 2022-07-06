@@ -26,19 +26,22 @@ public interface CollectionsController {
 	@RequestMapping(method = RequestMethod.GET, value = CollectionConstants.ROUTE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> getCollections(HttpServletRequest request);
 
+	@RequestMapping(method = RequestMethod.DELETE, value = CollectionConstants.ROUTE_WITH_PATH_VARIABLE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> deleteCollection(@PathVariable String id,HttpServletRequest request);
+
 	@RequestMapping(method = RequestMethod.POST, value = CollectionConstants.ITEM_ROUTE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> putItemIntoCollection(@PathVariable String id,
 			@RequestBody Map<String, Object> item, HttpServletRequest request);
-	
+
 	@RequestMapping(method = RequestMethod.PATCH, value = CollectionConstants.ITEM_ROUTE_ID, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Map<String, Object>> updateCollectionItem(@PathVariable String collectionId,@PathVariable String itemId,
-			@RequestBody Map<String, Object> item, HttpServletRequest request);
+	public ResponseEntity<Map<String, Object>> updateCollectionItem(@PathVariable String collectionId,
+			@PathVariable String itemId, @RequestBody Map<String, Object> item, HttpServletRequest request);
 
 	@RequestMapping(method = RequestMethod.GET, value = (CollectionConstants.ITEM_ROUTE), produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> getItemsFromCollection(@PathVariable String id,
 			@RequestParam Map<String, String> params, HttpServletRequest request);
-	
+
 	@RequestMapping(method = RequestMethod.PATCH, value = (CollectionConstants.ROUTE_WITH_PATH_VARIABLE), produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Map<String, Object>> updateCollectionMetaData (@PathVariable String id,
-			@RequestBody Map<String,Object> updatedCollection, HttpServletRequest request);
+	public ResponseEntity<Map<String, Object>> updateCollectionMetaData(@PathVariable String id,
+			@RequestBody Map<String, Object> updatedCollection, HttpServletRequest request);
 }
