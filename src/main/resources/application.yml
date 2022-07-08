@@ -15,9 +15,9 @@ spring:
    
    
   datasource:
-    url: jdbc:mysql://13.235.91.57:3306/crud_application
-    username: root
-    password: Nithin@143
+    url: jdbc:mysql://13.126.127.179:3306/crud_application
+    username: demo
+    password: nithin@143
     driver-class-name: com.mysql.cj.jdbc.Driver
  
 jwt:
@@ -36,7 +36,7 @@ logging:
           core: TRACE
        # boot: DEBUG
   file: 
-    path: ./
+    path:  /var/log
     name: crudapp.log
         
   
