@@ -35,6 +35,9 @@ logging:
         jdbc:
           core: TRACE
        # boot: DEBUG
+  file: 
+    path: /usr
+    name: crudapp.log
         
   
   
